@@ -287,28 +287,41 @@
      
      )
 
+(define (borde num)
+    (overlay
+     (text (number->string num) 16 "white")
+     (circle 20 "outline" "white"))
+      
+    )
 
 
 
-(define (r1 num)
-  ; num = (1 1 1 1 2 2 2 2 2)
-  (beside  (ficha (first num) )  (ficha (second num)) (ficha (third num)) (ficha ( fourth num)) (ficha (fifth num)) (ficha (sixth num)) (ficha (seventh num)) (ficha ( eighth num)) (ficha ( ninth num)) ) 
+(define (columnas num num-fila)
+  (beside   (borde num-fila) (ficha (first num))   (ficha (second num)) (ficha (third num)) (ficha ( fourth num)) (ficha (fifth num)) (ficha (sixth num)) (ficha (seventh num)) (ficha ( eighth num)) (ficha ( ninth num)) (borde num-fila)) 
 )
 
 
-(define (filas num )
-  (  r1 num )
+(define (filas num num-fila)
+  (cond
+    [(eq? num-fila 0)
+     (above (beside (borde 0) (borde 1) (borde 2) (borde 3) (borde 4) (borde 5) (borde 6) (borde 7) (borde 8)) (columnas num num-fila))]
+    [else (  columnas num num-fila)])
+           
 )
- 
 
 (define (mostrar-interfaz tablero)
 
-  (above (filas (first tablero) )  
-  (filas (second tablero))
-  (filas (third tablero)) 
-(filas ( fourth tablero)) (filas (fifth tablero)) (filas (sixth tablero)) (filas (seventh tablero)) (filas ( eighth tablero))
-  (filas ( ninth tablero))
-  )
+  (rotate -45(above (filas (first tablero) 0)  
+  (filas (second tablero) 1)
+  (filas (third tablero) 2) 
+(filas ( fourth tablero) 3) 
+(filas (fifth tablero) 4) 
+(filas (sixth tablero) 5) 
+(filas (seventh tablero) 6) 
+(filas ( eighth tablero) 7)
+  (filas ( ninth tablero) 8)
+  (beside (borde 0) (borde 1) (borde 2) (borde 3) (borde 4) (borde 5) (borde 6) (borde 7) (borde 8))
+  ))
 )
 
 (mostrar-interfaz  (cargar-movimientos '((1 1 1 1 2 2 2 2 2)
@@ -320,44 +333,14 @@
 					(2 2 2 2 2 2 2 3 3)
 					(2 2 2 2 2 2 3 3 3)
 					(2 2 2 2 2 3 3 3 3)) '(7 7) ))
-(mostrar-tablero (append (list "Coordenadas de posibles movimientos:") (buscar-movimientos-vecinos  '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7))))
 
-(display "Ingrese la coordenada del campo: ")
-(define campo (read))
-(display campo)
-(list? campo)
-(list-ref (buscar-movimientos-vecinos  '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7)) (sub1 campo) )
+(display "Ingrese la fila del campo: ")
+(define fila (read))
+(display "Ingrese la columna del campo: ")
+(define columna (read))
 
-(define (mostrar-movimientos movimientos)
-    (mostrar-movimientos-aux movimientos 1 empty))
 
-(define (mostrar-movimientos-aux movimientos contador nueva)
-    (cond
-    [(> contador (length movimientos)) (append nueva (list "ingrese la opcion") (number->string (length movimientos)))]
-    [else(mostrar-movimientos-aux movimientos (add1 contador) (append nueva (list (list contador) (list (list-ref movimientos (sub1 contador))))))]))
+(list fila columna)
 
-(mostrar-movimientos (buscar-movimientos-vecinos  '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7)))
+
+
