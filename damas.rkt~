@@ -249,7 +249,7 @@
 ;S: prints
 (define (mostrar-tablero tablero)
     (cond
-    [(null? tablero) "Ingrese donde quiere mover"]
+    [(null? tablero) "Tablero Damas chinas"]
     [else (printf "~s\n" (first tablero)) (mostrar-tablero (rest tablero))]))
 
 ;Funcionalidad Jogo
@@ -264,6 +264,16 @@
         (list-set tablero (first (first movimientos)) (list-set (list-ref tablero (first (first movimientos))) (second (first movimientos)) 4))
         ficha (rest movimientos))]))
 
+(mostrar-tablero (cargar-movimientos '((1 1 1 1 2 2 2 2 2)
+					(1 1 1 2 2 2 2 2 2)
+					(1 2 2 2 2 2 2 2 2)
+					(1 2 2 2 2 2 1 2 2)
+					(2 2 2 2 2 2 2 3 2)
+					(2 2 2 2 2 2 2 2 2)
+					(2 2 2 2 2 2 2 3 3)
+					(2 2 2 2 2 2 3 3 3)
+					(2 2 2 2 2 3 3 3 3)) '(7 7) ))
+
 (define celda
            (square 70 "outline" "blue"))
 (define celda-ficha
@@ -277,9 +287,7 @@
         [(= digit 3) (overlay
      (text (number->string digit) 16 "black")
      (circle 20 "solid" "blue"))]
-        [(= digit 4) (overlay
-     (text (number->string digit) 16 "black")
-     (circle 20 "solid" "green"))]
+        
         [else(overlay
      (text (number->string digit) 16 "black")
      (circle 20 "solid" "grey")) ] ; es min
@@ -320,44 +328,3 @@
 					(2 2 2 2 2 2 2 3 3)
 					(2 2 2 2 2 2 3 3 3)
 					(2 2 2 2 2 3 3 3 3)) '(7 7) ))
-(mostrar-tablero (append (list "Coordenadas de posibles movimientos:") (buscar-movimientos-vecinos  '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7))))
-
-(display "Ingrese la coordenada del campo: ")
-(define campo (read))
-(display campo)
-(list? campo)
-(list-ref (buscar-movimientos-vecinos  '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7)) (sub1 campo) )
-
-(define (mostrar-movimientos movimientos)
-    (mostrar-movimientos-aux movimientos 1 empty))
-
-(define (mostrar-movimientos-aux movimientos contador nueva)
-    (cond
-    [(> contador (length movimientos)) (append nueva (list "ingrese la opcion") (number->string (length movimientos)))]
-    [else(mostrar-movimientos-aux movimientos (add1 contador) (append nueva (list (list contador) (list (list-ref movimientos (sub1 contador))))))]))
-
-(mostrar-movimientos (buscar-movimientos-vecinos  '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7)))
