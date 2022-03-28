@@ -110,9 +110,14 @@
     (append 
         (bsd tablero ficha anteriores 0 movimientos)
         (bsi tablero ficha anteriores 0 movimientos)
+        (bi tablero ficha anteriores 0 movimientos)
+        (bii tablero ficha anteriores 0 movimientos)
+        (bid tablero ficha anteriores 0 movimientos)
+        (bd tablero ficha anteriores 0 movimientos)
+
         movimientos))
 
-(define (bsd tablero ficha anteriores contador movimientos)
+(define (bsd tablero ficha anteriores contador movimientos); SD -1,0
     (cond
     [(or 
         (> contador 1)
@@ -125,11 +130,14 @@
             (bsd tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
         [else(bsd tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)])]
     [(eq? (obtener-celda tablero (sub1 (first ficha)) (second ficha)) 2)
-        (bsd tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
-            (append (bmv tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (second ficha))) movimientos)) movimientos))]
+        (cond 
+        [(eq? contador 0)
+            (bsd tablero ficha (cons ficha anteriores) 2 (append (list (list (sub1 (first ficha)) (second ficha))) movimientos))]
+        [else(bsd tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
+            (append (bmv tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
     [else(bsd tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)]))
 
-(define (bsi tablero ficha anteriores contador movimientos)
+(define (bsi tablero ficha anteriores contador movimientos);SI 0,-1
     (cond
     [(or 
         (> contador 1)
@@ -142,9 +150,93 @@
             (bsi tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
         [else(bsi tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
     [(eq? (obtener-celda tablero (first ficha) (sub1 (second ficha))) 2)
-        (bsi tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) 0 
-            (append (bmv tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (sub1 (second ficha)))) movimientos)) movimientos))]
+        (cond 
+        [(eq? contador 0)
+            (bsi tablero ficha (cons ficha anteriores) 2 (append (list (list (first ficha) (sub1 (second ficha)))) movimientos))]
+        [else(bsi tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) 0 
+            (append (bmv tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (sub1 (second ficha)))) movimientos)) movimientos))])]
     [else(bsi tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
+
+(define (bi tablero ficha anteriores contador movimientos);I +1,-1
+    (cond
+    [(or 
+        (> contador 1)
+        (eq? (obtener-celda tablero (add1 (first ficha)) (sub1 (second ficha))) 0)
+        (miembro? anteriores ficha))
+    movimientos]
+    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
+        (cond 
+        [(eq? (obtener-celda tablero (add1 (first ficha)) (sub1 (second ficha))) 2)
+            (bi tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
+        [else(bi tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
+    [(eq? (obtener-celda tablero (add1 (first ficha)) (sub1 (second ficha))) 2)
+        (cond 
+        [(eq? contador 0)
+            (bi tablero ficha (cons ficha anteriores) 2 (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos))]
+        [else(bi tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) 0 
+            (append (bmv tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos)) movimientos))])]
+    [else(bi tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
+
+(define (bii tablero ficha anteriores contador movimientos);II +1, 0
+    (cond
+    [(or 
+        (> contador 1)
+        (eq? (obtener-celda tablero (add1 (first ficha)) (second ficha)) 0)
+        (miembro? anteriores ficha))
+    movimientos]
+    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
+        (cond 
+        [(eq? (obtener-celda tablero (add1 (first ficha)) (second ficha)) 2)
+            (bii tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
+        [else(bii tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)])]
+    [(eq? (obtener-celda tablero (add1 (first ficha)) (second ficha)) 2)
+        (cond 
+        [(eq? contador 0)
+            (bii tablero ficha (cons ficha anteriores) 2 (append (list (list (add1 (first ficha)) (second ficha))) movimientos))]
+        [else(bii tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
+            (append (bmv tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
+    [else(bii tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)]))
+
+(define (bid tablero ficha anteriores contador movimientos);ID 0,+1
+    (cond
+    [(or 
+        (> contador 1)
+        (eq? (obtener-celda tablero (first ficha) (add1 (second ficha))) 0)
+        (miembro? anteriores ficha))
+    movimientos]
+    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
+        (cond 
+        [(eq? (obtener-celda tablero (first ficha) (add1 (second ficha))) 2)
+            (bid tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
+        [else(bid tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
+    [(eq? (obtener-celda tablero (first ficha) (add1 (second ficha))) 2)
+        (cond 
+        [(eq? contador 0)
+            (bid tablero ficha (cons ficha anteriores) 2 (append (list (list (first ficha) (add1 (second ficha)))) movimientos))]
+        [else(bid tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) 0 
+            (append (bmv tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (add1 (second ficha)))) movimientos)) movimientos))])]
+    [else(bid tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
+
+(define (bd tablero ficha anteriores contador movimientos);D -1,+1
+    (cond
+    [(or 
+        (> contador 1)
+        (eq? (obtener-celda tablero (sub1 (first ficha)) (add1 (second ficha))) 0)
+        (miembro? anteriores ficha))
+    movimientos]
+    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
+        (cond 
+        [(eq? (obtener-celda tablero (sub1 (first ficha)) (add1 (second ficha))) 2)
+            (bd tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
+        [else(bd tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
+    [(eq? (obtener-celda tablero (sub1 (first ficha)) (add1 (second ficha))) 2)
+        (cond 
+        [(eq? contador 0)
+            (bd tablero ficha (cons ficha anteriores) 2 (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos))]
+        [else(bd tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) 0 
+            (append (bmv tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos)) movimientos))])]
+    [else(bd tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
+
 ;Funciones de Interfaz
 (define (mostrar-tablero tablero)
     (cond
@@ -168,12 +260,22 @@
 ; 					                             (2 2 2 2 2 2 3 3 3)
 ; 					                             (2 2 2 2 2 3 3 3 3)) '(7 6) empty empty))
 
-(remove-duplicates (bmv '((1 1 1 1 2 2 2 2 2)
-					      (1 1 1 2 2 2 2 2 2)
-					      (1 2 2 2 2 2 2 2 2)
-					      (1 2 2 2 2 2 1 2 2)
+(remove-duplicates (bmv '((1 1 1 2 2 2 2 2 2)
+					      (1 1 2 2 2 2 2 2 2)
+					      (1 2 2 2 2 1 2 2 2)
+					      (1 2 2 2 1 2 1 2 2)
 					      (2 2 2 2 2 2 2 3 2)
 					      (2 2 2 2 2 2 2 2 2)
 					      (2 2 2 2 2 2 2 3 3)
 					      (2 2 2 2 2 2 3 3 3)
 					      (2 2 2 2 2 3 3 3 3)) '(7 7) empty empty))
+
+(remove-duplicates (bmv '((1 1 1 2 1 2 2 2 2)
+				    	  (1 1 1 2 2 3 2 2 2)
+					      (1 1 2 2 2 2 2 2 2)
+					      (1 2 2 2 2 2 2 2 2)
+					      (2 2 2 2 2 2 2 2 2)   
+					      (2 2 2 2 2 2 2 2 3)
+					      (2 2 2 2 2 2 2 3 3)
+					      (2 2 2 2 2 2 3 3 3)
+					      (2 2 2 2 2 2 3 3 3)) '(0 1) empty empty))
