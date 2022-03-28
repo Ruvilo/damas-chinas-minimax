@@ -1,7 +1,7 @@
 #lang racket
 ;Funciones que creadoras
 (define (crear-tablero )
-    (crear-tablero-aux empty 4))
+    (reverse (crear-tablero-aux empty 4)))
 
 (define (crear-tablero-aux tablero fichas)
     (cond
@@ -45,7 +45,13 @@
     [(not (eq? (member elemento lista) #f)) #t]
     [else #f]))
 
-(define (buscar-movimientos-vecinos  tablero ficha anteriores movimientos);
+
+;#Funcion que devuelve los posibles movimientos de una ficha  
+(define (buscar-movimientos-vecinos mat ficha ) (remove-duplicates (buscar-movimientos-vecinos-aux  mat ficha empty empty)))
+
+
+
+(define (buscar-movimientos-vecinos-aux  tablero ficha anteriores movimientos);
     (append 
         (buscar-superior-derecho  tablero ficha anteriores 0 movimientos)
         (buscar-superior-izquierdo  tablero ficha anteriores 0 movimientos)
@@ -73,7 +79,7 @@
         [(eq? contador 0)
             (buscar-superior-derecho  tablero ficha (cons ficha anteriores) 2 (append (list (list (sub1 (first ficha)) (second ficha))) movimientos))]
         [else(buscar-superior-derecho  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
+            (append (buscar-movimientos-vecinos-aux  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
     [else(buscar-superior-derecho  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)]))
 
 (define (buscar-superior-izquierdo  tablero ficha anteriores contador movimientos);SI 0,-1
@@ -93,7 +99,7 @@
         [(eq? contador 0)
             (buscar-superior-izquierdo  tablero ficha (cons ficha anteriores) 2 (append (list (list (first ficha) (sub1 (second ficha)))) movimientos))]
         [else(buscar-superior-izquierdo  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (sub1 (second ficha)))) movimientos)) movimientos))])]
+            (append (buscar-movimientos-vecinos-aux  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (sub1 (second ficha)))) movimientos)) movimientos))])]
     [else(buscar-superior-izquierdo  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
 
 (define (buscar-izquierdo tablero ficha anteriores contador movimientos);I +1,-1
@@ -113,7 +119,7 @@
         [(eq? contador 0)
             (buscar-izquierdo tablero ficha (cons ficha anteriores) 2 (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos))]
         [else(buscar-izquierdo tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos  tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos)) movimientos))])]
+            (append (buscar-movimientos-vecinos-aux  tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos)) movimientos))])]
     [else(buscar-izquierdo tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
 
 (define (buscar-inferior-izquierdo tablero ficha anteriores contador movimientos);II +1, 0
@@ -133,7 +139,7 @@
         [(eq? contador 0)
             (buscar-inferior-izquierdo tablero ficha (cons ficha anteriores) 2 (append (list (list (add1 (first ficha)) (second ficha))) movimientos))]
         [else(buscar-inferior-izquierdo tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos  tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
+            (append (buscar-movimientos-vecinos-aux  tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
     [else(buscar-inferior-izquierdo tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)]))
 
 (define (buscar-inferior-derecho  tablero ficha anteriores contador movimientos);ID 0,+1
@@ -153,7 +159,7 @@
         [(eq? contador 0)
             (buscar-inferior-derecho  tablero ficha (cons ficha anteriores) 2 (append (list (list (first ficha) (add1 (second ficha)))) movimientos))]
         [else(buscar-inferior-derecho  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (add1 (second ficha)))) movimientos)) movimientos))])]
+            (append (buscar-movimientos-vecinos-aux  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (add1 (second ficha)))) movimientos)) movimientos))])]
     [else(buscar-inferior-derecho  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
 
 (define (buscar-derecho tablero ficha anteriores contador movimientos);D -1,+1
@@ -173,8 +179,10 @@
         [(eq? contador 0)
             (buscar-derecho tablero ficha (cons ficha anteriores) 2 (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos))]
         [else(buscar-derecho tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos  tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos)) movimientos))])]
+            (append (buscar-movimientos-vecinos-aux  tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos)) movimientos))])]
     [else(buscar-derecho tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
+
+
 
 ;Funciones de Interfaz
 (define (mostrar-tablero tablero)
@@ -188,8 +196,8 @@
 ;(obtener-celda (reverse (crear-tablero)) 7 6)
 ; (obtener-celda (reverse (crear-tablero)) 6 6)
 ; (obtener-celda (reverse (crear-tablero)) 7 4)
-;(remove-duplicates (buscar-movimientos-vecinos (reverse (crear-tablero)) '(7 7) empty empty))
-; (remove-duplicates (buscar-movimientos-vecinos '((1 1 1 1 2 2 2 2 2)
+;(remove-duplicates (buscar-movimientos-vecinos-aux (reverse (crear-tablero)) '(7 7) empty empty))
+; (remove-duplicates (buscar-movimientos-vecinos-aux '((1 1 1 1 2 2 2 2 2)
 ; 					                             (1 1 1 2 2 2 2 2 2)
 ; 					                             (1 2 2 2 2 2 2 2 2)
 ; 					                             (1 2 2 2 2 2 1 2 2)
@@ -199,17 +207,13 @@
 ; 					                             (2 2 2 2 2 2 3 3 3)
 ; 					                             (2 2 2 2 2 3 3 3 3)) '(7 6) empty empty))
 
-(remove-duplicates (buscar-movimientos-vecinos  '((1 1 1 2 2 2 2 2 2)
-					      (1 1 2 2 2 2 2 2 2)
-					      (1 2 2 2 2 1 2 2 2)
-					      (1 2 2 2 1 2 1 2 2)
-					      (2 2 2 2 2 2 2 3 2)
-					      (2 2 2 2 2 2 2 2 2)
-					      (2 2 2 2 2 2 2 3 3)
-					      (2 2 2 2 2 2 3 3 3)
-					      (2 2 2 2 2 3 3 3 3)) '(7 7) empty empty))
 
-(remove-duplicates (buscar-movimientos-vecinos  '((1 1 1 2 1 2 2 2 2)
+
+
+(buscar-movimientos-vecinos  (crear-tablero) '(7 7))
+
+
+(buscar-movimientos-vecinos '((1 1 1 2 1 2 2 2 2)
 				    	  (1 1 1 2 2 3 2 2 2)
 					      (1 1 2 2 2 2 2 2 2)
 					      (1 2 2 2 2 2 2 2 2)
@@ -217,4 +221,4 @@
 					      (2 2 2 2 2 2 2 2 3)
 					      (2 2 2 2 2 2 2 3 3)
 					      (2 2 2 2 2 2 3 3 3)
-					      (2 2 2 2 2 2 3 3 3)) '(0 1) empty empty))
+					      (2 2 2 2 2 2 3 3 3)) '(0 1) )
