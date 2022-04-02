@@ -1,5 +1,15 @@
-#lang racket
+#lang racket/gui
 (require 2htdp/image)
+
+
+(provide crear-tablero)
+(provide obtener-celda)
+(provide mostrar-tablero)
+(provide cargar-movimientos)
+(provide remover-movimientos)
+(provide cargar-fichas)
+(provide miembro?)
+(provide mover)
 
 #|
     Proyecto 01: Minimax - Damas Chinas
@@ -264,6 +274,38 @@
         (list-set tablero (first (first movimientos)) (list-set (list-ref tablero (first (first movimientos))) (second (first movimientos)) 4))
         ficha (rest movimientos))]))
 
+(define (remover-movimientos tablero ficha)
+    (remover-movimientos-aux tablero ficha (buscar-movimientos-vecinos tablero ficha)))
+
+(define (remover-movimientos-aux tablero ficha movimientos)
+    (cond
+    [(empty? movimientos) tablero]
+    [else(remover-movimientos-aux 
+        (list-set tablero (first (first movimientos)) (list-set (list-ref tablero (first (first movimientos))) (second (first movimientos)) 2))
+        ficha (rest movimientos))]))
+
+(define (mover tablero turno ficha campo)
+    (mover-aux tablero turno ficha campo (buscar-movimientos-vecinos tablero ficha)))
+
+(define (mover-aux tablero turno ficha campo movimientos)
+    (cond
+    [(and 
+        (miembro? movimientos campo)
+        (not (empty? ficha))) 
+        (list-set (vaciar-campo tablero ficha) (first campo) (list-set (list-ref (vaciar-campo tablero ficha) (first campo)) (second campo) turno))]
+    [else #f]))
+
+(define (vaciar-campo tablero ficha)
+    (list-set tablero (first ficha) (list-set (list-ref tablero (first ficha)) (second ficha) 2)))
+
+(define (cambiar-turno turno)
+    (cond
+    [(eq? turno 1) 3]
+    [else 1]))
+
+; (mostrar-tablero (mover (crear-tablero) 1 (list 1 1) (list 1 3)))
+; (mover (crear-tablero) 1 (list 1 1) (list 9 10))
+
 (define celda
            (square 70 "outline" "blue"))
 (define celda-ficha
@@ -289,8 +331,8 @@
 
 (define (borde num)
     (overlay
-     (text (number->string num) 16 "white")
-     (circle 20 "outline" "white"))
+     (text (number->string num) 16 "black")
+     (circle 20 "outline" "black"))
       
     )
 
@@ -324,23 +366,65 @@
   ))
 )
 
-(mostrar-interfaz  (cargar-movimientos '((1 1 1 1 2 2 2 2 2)
-					(1 1 1 2 2 2 2 2 2)
-					(1 2 2 2 2 2 2 2 2)
-					(1 2 2 2 2 2 1 2 2)
-					(2 2 2 2 2 2 2 3 2)
-					(2 2 2 2 2 2 2 2 2)
-					(2 2 2 2 2 2 2 3 3)
-					(2 2 2 2 2 2 3 3 3)
-					(2 2 2 2 2 3 3 3 3)) '(7 7) ))
-
-(display "Ingrese la fila del campo: ")
-(define fila (read))
-(display "Ingrese la columna del campo: ")
-(define columna (read))
+; (mostrar-interfaz  (cargar-movimientos '((1 1 1 1 2 2 2 2 2)
+; 					(1 1 1 2 2 2 2 2 2)
+; 					(1 2 2 2 2 2 2 2 2)
+; 					(1 2 2 2 2 2 1 2 2)
+; 					(2 2 2 2 2 2 2 3 2)
+; 					(2 2 2 2 2 2 2 2 2)
+; 					(2 2 2 2 2 2 2 3 3)
+; 					(2 2 2 2 2 2 3 3 3)
+; 					(2 2 2 2 2 3 3 3 3)) '(7 7) ))
 
 
-(list fila columna)
+(define (juego tablero turno gana-player gana-ia)
+  ;(mostrar-interfaz tablero)
+  (cond
+    [(equal? (first (cargar-fichas tablero)) gana-player) 3]
+    [(equal? (second (cargar-fichas tablero)) gana-ia) 1]
+    [else
+     ;(read-line)
+     ;(mostrar-interfaz tablero)
+     ;(mostrar-tablero tablero)
+     ;(mostrar-interfaz tablero)
+     
+     (display "Ingrese la fila de la ficha: ")
+      (define fila-ficha (read))
+       (display "Ingrese la columna de la ficha: ")
+        (define columna-ficha (read))
+        (empty-scene 160 90)
+        (mostrar-interfaz (cargar-movimientos tablero (list fila-ficha columna-ficha)))
+        (display "Ingrese la fila del campo: ")
+        (define fila-campo (read))
+        (display "Ingrese la columna del campo: ")
+        (define columna-campo (read))
+        (cond
+        [(list? (mover tablero turno (list fila-ficha columna-ficha) (list fila-campo columna-campo)))
+        (juego (mover tablero turno (list fila-ficha columna-ficha) (list fila-campo columna-campo)) (cambiar-turno turno) gana-player gana-ia)]
+        [else (juego tablero turno gana-player gana-ia )])
+        ]))
 
-
+;(second (cargar-fichas (crear-tablero)))
+;(mostrar-interfaz (crear-tablero))
+; (define frame (new frame%
+;                    [label "Example"]
+;                    [width 500]
+;                    [height 300]))
+; (new canvas% [parent frame]
+;              [paint-callback
+;               (lambda (canvas dc)
+;                 (send dc set-scale 3 3)
+;                 (send dc set-text-foreground "blue")
+;                 (send dc draw-text "Don't Panic!" 0 0))])
+; (send frame show #t)
+; (juego '((1 1 1 1 2 2 2 2 2)
+; 					(1 1 1 2 2 2 2 2 2)
+; 					(1 1 2 2 2 2 2 2 2)
+; 					(1 2 2 2 2 2 2 2 2)
+; 					(2 2 2 2 2 2 2 2 2)
+; 					(2 2 2 2 2 2 2 2 3)
+; 					(2 2 2 2 2 2 2 3 3)
+; 					(2 2 2 2 2 2 3 3 3)
+; 					(2 2 2 2 2 3 3 3 3)) 3 '((3 0) (2 1) (2 0) (1 2) (1 1) (1 0) (0 3) (0 2) (0 1) (0 0)) '((8 8) (8 7) (8 6) (8 5) (7 8) (7 7) (7 6) (6 8) (6 7) (5 8)))
+;(define (refresco tablero) (mostrar-interfaz tablero))
 
