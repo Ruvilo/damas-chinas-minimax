@@ -1,7 +1,5 @@
 #lang racket/gui
 (require 2htdp/image)
-
-
 (provide crear-tablero)
 (provide obtener-celda)
 (provide mostrar-tablero)
@@ -261,8 +259,11 @@
     [(null? tablero) "Tablero Damas contra Sufeiya"]
     [else (printf "~s\n" (first tablero)) (mostrar-tablero (rest tablero))]))
 
-;Funcionalidad Jogo
+;Funcionalidad Juego
 
+;Funcion que carga los movimientos posibles en el tablero
+;E: tablero, ficha
+;S: tablero modificado
 (define (cargar-movimientos tablero ficha)
     (cargar-movimientos-aux tablero ficha (buscar-movimientos-vecinos tablero ficha)))
 
@@ -273,6 +274,9 @@
         (list-set tablero (first (first movimientos)) (list-set (list-ref tablero (first (first movimientos))) (second (first movimientos)) 4))
         ficha (rest movimientos))]))
 
+;Funcion que mueve la ficha atraves del tablero, estableciendo la posicion de origen a un estado 2 (vacia)
+;E: tablero, turno, ficha, campo (lugar al que va la ficha)
+;S: tablero modificado
 (define (mover tablero turno ficha campo)
     (mover-aux tablero turno ficha campo (buscar-movimientos-vecinos tablero ficha)))
 
@@ -284,9 +288,15 @@
         (list-set (vaciar-campo tablero ficha) (first campo) (list-set (list-ref (vaciar-campo tablero ficha) (first campo)) (second campo) turno))]
     [else #f]))
 
+;Funcion que establece la posicion dada a un estado 2 (vacia)
+;E: tablero, ficha (lugar de la ficha)
+;S: tablero modificado
 (define (vaciar-campo tablero ficha)
     (list-set tablero (first ficha) (list-set (list-ref tablero (first ficha)) (second ficha) 2)))
 
+;Funcion que cambia los turnos, 1 para rojas, 3 para azules
+;E: turno
+;S: int, el siguiente numero (1 -> 3 | 3 -> 1)
 (define (cambiar-turno turno)
     (cond
     [(eq? turno 1) 3]
