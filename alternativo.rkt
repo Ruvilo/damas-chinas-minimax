@@ -7,15 +7,15 @@
 ;#######################################################
 ;###################################################################################
 (define (tablero-prueba) 
-                        '((2 2 1 2 1 2 2 2 2)
-				    	  (2 2 1 2 2 3 2 2 2)
-					      (1 2 2 2 2 2 2 2 2)
-					      (1 2 2 2 2 2 2 2 2)
-					      (2 2 2 2 2 2 2 2 2)   
-					      (2 2 2 2 2 2 2 2 3)
-					      (2 2 2 2 2 2 2 3 3)
-					      (2 2 2 2 2 2 3 3 3)
-					      (2 2 2 2 2 2 3 3 3))
+              '((3 3 3 3 2 2 2 2 2)
+				    	  (3 3 3 2 2 2 2 2 2)
+					      (3 3 2 2 2 1 2 2 2)
+					      (3 2 2 2 2 2 2 2 2)
+					      (2 2 2 2 2 1 2 2 2)   
+					      (2 2 2 2 1 2 2 2 2)
+					      (2 2 1 2 2 2 2 2 2)
+					      (2 2 2 2 2 2 1 2 2)
+					      (2 2 2 2 2 2 2 1 2))
 )
 
 
@@ -57,7 +57,11 @@
 ;(tablero-prueba)
 
 ;(first (cargar-fichas  (tablero-prueba))) 
-(eval (tablero-prueba) '(7 7) -1)
-(eval (tablero-prueba) '(8 6 ) -1)
-(eval (tablero-prueba) '(0 3  ) -1)
-(mostrar-tablero (tablero-prueba))
+;(eval (tablero-prueba) '(7 7) -1)
+;(eval (tablero-prueba) '(8 6 ) -1)
+;(eval (tablero-prueba) '(0 3  ) -1)
+;(first (cargar-fichas  (tablero-prueba))) 
+
+
+
+(eval-tablero (tablero-prueba) 3)

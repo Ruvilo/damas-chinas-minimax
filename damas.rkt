@@ -318,4 +318,29 @@
     [(empty? movimientos) (cargar-movimientos-fichas-aux tablero turno (rest fichas) tableros (first fichas) (buscar-movimientos-vecinos tablero (first fichas)))]
     [else (cargar-movimientos-fichas-aux tablero turno fichas (append  tableros  (list (mover tablero turno ficha (first movimientos)))) ficha (rest movimientos))]))
 
+; Eval 
+
+ (define (eval tablero ficha turno)
+        (define (eval_aux tablero ficha turno meta) 
+            (+ (- (first meta) (* turno (first ficha))) (- (second meta) (* turno (second ficha))))                       
+        ) 
+        ; Funcion Eval: evalua la cercania de una ficha con su meta al otro lado del tablero 
+        ; Entre menor sea su resultado , mejor
+        ; Entradas: el tablero , la ficha a evaluar y un turno (1 o -1)
+      (cond
+        [(= turno 1) (eval_aux tablero ficha turno `(8 8))] ; turno positivo , El 1 esta jugando 
+        [else ( eval_aux tablero ficha turno `(0 0))] ; turno negativo , El 3 esta jugando
+       )
+  )
+
+(define (eval-tablero tablero turno) 
+    (cond
+    [(= turno 3) (eval-tablero-aux tablero -1 (first (cargar-fichas tablero)) 0)]
+    [else (eval-tablero-aux tablero 1 (second (cargar-fichas tablero)) 0)]))
+
+(define (eval-tablero-aux tablero turno fichas total) 
+    (cond
+    [(empty? fichas) (- total 20)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+    [else (eval-tablero-aux tablero turno (rest fichas) (+ (eval tablero (first fichas) turno) total))]))
+
 
