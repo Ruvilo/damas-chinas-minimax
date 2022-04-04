@@ -6,6 +6,7 @@
 (define ventana (open-viewport "Damas Chinas contra Sufeiya" 650 700))
 (define oculta (open-pixmap "Secreto" 650 700))
 
+;Funcion que crea un mapa del tablero de la interfaz, para medir limites
 (define (cargar-celdas tablero)
     (cargar-celdas-aux tablero 0 0 305 50 empty empty))
 
@@ -16,7 +17,9 @@
     [else
         (cargar-celdas-aux tablero fila (add1 columna) (+ x 20) (+ y 35) mapa (append fila-mapa (list (list x y))))]))
 
-
+;Funcion crea un mapa espejo del tablero, en funcion a la interfaz, encontrar (i, j) del tablero inicial
+;E: tablero
+;S: tablero espejo de la interfaz
 (define (crear-mapa-interfaz tablero)
     (crear-mapa-interfaz-aux tablero 0 0 305 50 empty empty))
 
@@ -27,6 +30,9 @@
     [else
         (crear-mapa-interfaz-aux tablero fila (add1 columna) (+ x 20) (+ y 35) mapa (append fila-mapa (list (list x y))))]))
 
+;Funcion que busca en el mapa el indice exacto en el tablero
+;E: tablero espejo, punto del tablero espejo
+;S: lista con el (i, j) del tablero
 (define (buscar-indice-coordenada mapa coordenada)
     (buscar-indice-coordenada-aux mapa coordenada 0))
 
@@ -36,6 +42,9 @@
     [(not (eq? (index-of (list-ref mapa fila) coordenada) #f)) (list fila (index-of (list-ref mapa fila) coordenada))]
     [else(buscar-indice-coordenada-aux mapa coordenada (add1 fila))]))
 
+;Funcion que renderiza toda la interfaz, incluyendo movimientos, fichas y posibles movimientos
+;E: tablero
+;S: la interfaz
 (define (mostrar-interfaz tablero)
     (mostrar-interfaz-aux tablero 0 0 305 50))
 
@@ -47,6 +56,9 @@
         (renderizar-ficha (obtener-celda tablero fila columna) x y)
         (mostrar-interfaz-aux tablero fila (add1 columna) (+ x 20) (+ y 35))]))
 
+;Funcion que renderiza las fichas del tablero, grises, rojas y azules en la interfaz
+;E: valor (tipo de ficha 1 3 jugadores, 2 vacia, 4 posible mov)
+;S: tablero con fichas
 (define (renderizar-ficha valor x y)
     (cond
         [(= valor 1) 
@@ -57,6 +69,9 @@
             ((draw-solid-ellipse oculta) (make-posn x y) 40 40 "lightgreen")]
         [else((draw-solid-ellipse oculta) (make-posn x y) 40 40 "Gainsboro")]))
 
+;Funcion que realiza las acciones adecuadas cada entrada del teclado
+;E: posiciones en la interfaz (x, y), lado (accion), tablero
+;S: accion en la interfaz
 (define (marca x y lado tablero)
     (cond
     [(equal? lado 'arriba)
@@ -89,6 +104,9 @@
         (mostrar-interfaz tablero)]
     [else (void)]))
 
+;Funcion que lee las entradas del teclado
+;E: posiciones (x, y), tecla, tablero, mapa (tablero espejo), ficha (posicion tablero), t-original(tablero origen)
+;S: marca (accion debida)
 (define (teclado x y tecla tablero mapa ficha t-original)
     (cond
     [(miembro? (cargar-celdas tablero) (list x y)) 
@@ -134,9 +152,4 @@
         (marca 305 330 'arriba tablero)
         (teclado 305 330 (key-value (get-key-press ventana)) t-original mapa ficha t-original)]))
 (teclado 305 330 'control (crear-tablero) (crear-mapa-interfaz (crear-tablero)) empty (crear-tablero))
-;(mostrar-interfaz (crear-tablero))
 
-;(miembro? (cargar-celdas (crear-tablero)) (list 325 50))
-
-; (mostrar-tablero (crear-mapa-interfaz (crear-tablero))) ;retorna una lista con todas las coordenadas de todo el tablero
-; (buscar-indice-coordenada (crear-mapa-interfaz (crear-tablero)) (list 305 630))
