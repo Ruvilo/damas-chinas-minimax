@@ -6,7 +6,6 @@
 (provide obtener-celda)
 (provide mostrar-tablero)
 (provide cargar-movimientos)
-(provide remover-movimientos)
 (provide cargar-fichas)
 (provide miembro?)
 (provide mover)
@@ -259,7 +258,7 @@
 ;S: prints
 (define (mostrar-tablero tablero)
     (cond
-    [(null? tablero) "Ingrese donde quiere mover"]
+    [(null? tablero) "Tablero Damas contra Sufeiya"]
     [else (printf "~s\n" (first tablero)) (mostrar-tablero (rest tablero))]))
 
 ;Funcionalidad Jogo
@@ -272,16 +271,6 @@
     [(empty? movimientos) tablero]
     [else(cargar-movimientos-aux 
         (list-set tablero (first (first movimientos)) (list-set (list-ref tablero (first (first movimientos))) (second (first movimientos)) 4))
-        ficha (rest movimientos))]))
-
-(define (remover-movimientos tablero ficha)
-    (remover-movimientos-aux tablero ficha (buscar-movimientos-vecinos tablero ficha)))
-
-(define (remover-movimientos-aux tablero ficha movimientos)
-    (cond
-    [(empty? movimientos) tablero]
-    [else(remover-movimientos-aux 
-        (list-set tablero (first (first movimientos)) (list-set (list-ref tablero (first (first movimientos))) (second (first movimientos)) 2))
         ficha (rest movimientos))]))
 
 (define (mover tablero turno ficha campo)
@@ -302,129 +291,3 @@
     (cond
     [(eq? turno 1) 3]
     [else 1]))
-
-; (mostrar-tablero (mover (crear-tablero) 1 (list 1 1) (list 1 3)))
-; (mover (crear-tablero) 1 (list 1 1) (list 9 10))
-
-(define celda
-           (square 70 "outline" "blue"))
-(define celda-ficha
-    (overlay/align "center" "center" (circle 15 "solid" "yellow") celda))
-
-(define (ficha digit)
-     (cond
-        [(= digit 1) (overlay
-     (text (number->string digit) 16 "black")
-     (circle 20 "solid" "red"))]
-        [(= digit 3) (overlay
-     (text (number->string digit) 16 "black")
-     (circle 20 "solid" "blue"))]
-        [(= digit 4) (overlay
-     (text (number->string digit) 16 "black")
-     (circle 20 "solid" "green"))]
-        [else(overlay
-     (text (number->string digit) 16 "black")
-     (circle 20 "solid" "grey")) ] ; es min
-    )
-     
-     )
-
-(define (borde num)
-    (overlay
-     (text (number->string num) 16 "black")
-     (circle 20 "outline" "black"))
-      
-    )
-
-
-
-(define (columnas num num-fila)
-  (beside   (borde num-fila) (ficha (first num))   (ficha (second num)) (ficha (third num)) (ficha ( fourth num)) (ficha (fifth num)) (ficha (sixth num)) (ficha (seventh num)) (ficha ( eighth num)) (ficha ( ninth num)) (borde num-fila)) 
-)
-
-
-(define (filas num num-fila)
-  (cond
-    [(eq? num-fila 0)
-     (above (beside (borde 0) (borde 1) (borde 2) (borde 3) (borde 4) (borde 5) (borde 6) (borde 7) (borde 8)) (columnas num num-fila))]
-    [else (  columnas num num-fila)])
-           
-)
-
-(define (mostrar-interfaz tablero)
-
-  (rotate -45(above (filas (first tablero) 0)  
-  (filas (second tablero) 1)
-  (filas (third tablero) 2) 
-(filas ( fourth tablero) 3) 
-(filas (fifth tablero) 4) 
-(filas (sixth tablero) 5) 
-(filas (seventh tablero) 6) 
-(filas ( eighth tablero) 7)
-  (filas ( ninth tablero) 8)
-  (beside (borde 0) (borde 1) (borde 2) (borde 3) (borde 4) (borde 5) (borde 6) (borde 7) (borde 8))
-  ))
-)
-
-; (mostrar-interfaz  (cargar-movimientos '((1 1 1 1 2 2 2 2 2)
-; 					(1 1 1 2 2 2 2 2 2)
-; 					(1 2 2 2 2 2 2 2 2)
-; 					(1 2 2 2 2 2 1 2 2)
-; 					(2 2 2 2 2 2 2 3 2)
-; 					(2 2 2 2 2 2 2 2 2)
-; 					(2 2 2 2 2 2 2 3 3)
-; 					(2 2 2 2 2 2 3 3 3)
-; 					(2 2 2 2 2 3 3 3 3)) '(7 7) ))
-
-
-(define (juego tablero turno gana-player gana-ia)
-  ;(mostrar-interfaz tablero)
-  (cond
-    [(equal? (first (cargar-fichas tablero)) gana-player) 3]
-    [(equal? (second (cargar-fichas tablero)) gana-ia) 1]
-    [else
-     ;(read-line)
-     ;(mostrar-interfaz tablero)
-     ;(mostrar-tablero tablero)
-     ;(mostrar-interfaz tablero)
-     
-     (display "Ingrese la fila de la ficha: ")
-      (define fila-ficha (read))
-       (display "Ingrese la columna de la ficha: ")
-        (define columna-ficha (read))
-        (empty-scene 160 90)
-        (mostrar-interfaz (cargar-movimientos tablero (list fila-ficha columna-ficha)))
-        (display "Ingrese la fila del campo: ")
-        (define fila-campo (read))
-        (display "Ingrese la columna del campo: ")
-        (define columna-campo (read))
-        (cond
-        [(list? (mover tablero turno (list fila-ficha columna-ficha) (list fila-campo columna-campo)))
-        (juego (mover tablero turno (list fila-ficha columna-ficha) (list fila-campo columna-campo)) (cambiar-turno turno) gana-player gana-ia)]
-        [else (juego tablero turno gana-player gana-ia )])
-        ]))
-
-;(second (cargar-fichas (crear-tablero)))
-;(mostrar-interfaz (crear-tablero))
-; (define frame (new frame%
-;                    [label "Example"]
-;                    [width 500]
-;                    [height 300]))
-; (new canvas% [parent frame]
-;              [paint-callback
-;               (lambda (canvas dc)
-;                 (send dc set-scale 3 3)
-;                 (send dc set-text-foreground "blue")
-;                 (send dc draw-text "Don't Panic!" 0 0))])
-; (send frame show #t)
-; (juego '((1 1 1 1 2 2 2 2 2)
-; 					(1 1 1 2 2 2 2 2 2)
-; 					(1 1 2 2 2 2 2 2 2)
-; 					(1 2 2 2 2 2 2 2 2)
-; 					(2 2 2 2 2 2 2 2 2)
-; 					(2 2 2 2 2 2 2 2 3)
-; 					(2 2 2 2 2 2 2 3 3)
-; 					(2 2 2 2 2 2 3 3 3)
-; 					(2 2 2 2 2 3 3 3 3)) 3 '((3 0) (2 1) (2 0) (1 2) (1 1) (1 0) (0 3) (0 2) (0 1) (0 0)) '((8 8) (8 7) (8 6) (8 5) (7 8) (7 7) (7 6) (6 8) (6 7) (5 8)))
-;(define (refresco tablero) (mostrar-interfaz tablero))
-

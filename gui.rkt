@@ -110,15 +110,26 @@
         (miembro? (first (cargar-fichas t-original)) (buscar-indice-coordenada mapa (list x y))))
         (marca x y 'espacio (cargar-movimientos t-original (buscar-indice-coordenada mapa (list x y))))
         (teclado x y (key-value (get-key-press ventana)) (cargar-movimientos t-original (buscar-indice-coordenada mapa (list x y))) mapa (buscar-indice-coordenada mapa (list x y)) t-original)]
-    [(and 
-        (equal? tecla #\return)
-        (list? (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y)))))
-     (mostrar-tablero (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))
-            (marca x y 'enter (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))
-            (teclado x y (key-value (get-key-press ventana)) 
-                (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))) mapa empty (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))]
-    [else (marca x y 'arriba tablero)
-        (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
+    [(equal? tecla #\space)
+        (cond
+        [(and 
+            (empty? ficha)
+            (miembro? (first (cargar-fichas t-original)) (buscar-indice-coordenada mapa (list x y))))
+                (marca x y 'espacio (cargar-movimientos t-original (buscar-indice-coordenada mapa (list x y))))
+                (teclado x y (key-value (get-key-press ventana)) (cargar-movimientos t-original (buscar-indice-coordenada mapa (list x y))) mapa (buscar-indice-coordenada mapa (list x y)) t-original)]
+        [(and 
+            (not (empty? ficha))
+            (list? (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y)))))
+                (marca x y 'enter (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))
+                (teclado x y (key-value (get-key-press ventana)) 
+                    (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))) mapa empty (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))]
+        [else 
+            (marca x y 'arriba tablero)
+            (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
+    [else 
+            (marca x y 'arriba tablero)
+            (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
+    
     [else
         (marca 305 330 'arriba tablero)
         (teclado 305 330 (key-value (get-key-press ventana)) t-original mapa ficha t-original)]))
