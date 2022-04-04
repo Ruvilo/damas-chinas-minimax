@@ -301,3 +301,21 @@
     (cond
     [(eq? turno 1) 3]
     [else 1]))
+
+
+
+;#####################################################################
+; MinMax
+
+
+;Funciones minimax de Sufeiya
+(define (cargar-movimientos-fichas tablero)
+    (cargar-movimientos-fichas-aux tablero 1 (second (cargar-fichas tablero)) empty empty empty))
+
+(define (cargar-movimientos-fichas-aux tablero turno fichas tableros ficha movimientos)
+    (cond
+    [(empty? fichas) tableros]
+    [(empty? movimientos) (cargar-movimientos-fichas-aux tablero turno (rest fichas) tableros (first fichas) (buscar-movimientos-vecinos tablero (first fichas)))]
+    [else (cargar-movimientos-fichas-aux tablero turno fichas (append  tableros  (list (mover tablero turno ficha (first movimientos)))) ficha (rest movimientos))]))
+
+

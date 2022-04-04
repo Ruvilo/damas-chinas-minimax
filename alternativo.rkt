@@ -1,25 +1,26 @@
 #lang racket
+
+(require "damas.rkt")
 ;Funciones que creadoras
-(define (crear-tablero )
-    (reverse (crear-tablero-aux empty 4)))
 
-(define (crear-tablero-aux tablero fichas)
-    (cond
-    [(>= (length tablero) 9) tablero]
-    [(< (length tablero) 4) (crear-tablero-aux (cons (append (llenar-lista fichas 1) (llenar-lista (- 9 fichas) 2)) tablero) (sub1 fichas))]
-    [else(crear-tablero-aux (cons (append (llenar-lista (- 9 fichas) 2) (llenar-lista fichas 3)) tablero) (add1 fichas))]))   
+;; Parte Nueva --------(F)-------------
+;#######################################################
+;###################################################################################
+(define (tablero-prueba) 
+                        '((2 2 1 2 1 2 2 2 2)
+				    	  (2 2 1 2 2 3 2 2 2)
+					      (1 2 2 2 2 2 2 2 2)
+					      (1 2 2 2 2 2 2 2 2)
+					      (2 2 2 2 2 2 2 2 2)   
+					      (2 2 2 2 2 2 2 2 3)
+					      (2 2 2 2 2 2 2 3 3)
+					      (2 2 2 2 2 2 3 3 3)
+					      (2 2 2 2 2 2 3 3 3))
+)
 
-(define (llenar-lista cantidad elemento)
-    (cond
-    [(<= cantidad 0) '()]
-    [else (llenar-lista-aux cantidad elemento '())]))
 
-(define (llenar-lista-aux cantidad elemento nueva)
-    (cond
-    [(eq? cantidad 0) nueva]
-    [else (llenar-lista-aux (- cantidad 1) elemento (cons elemento nueva))]))
 
-(define (cargar-fichas tablero)
+(define (cargar-fichas tablero)   ; first para las fichas 3 y second para todas las fichas 1 
     (cargar-fichas-aux tablero 0 0 '() '()))
 
 (define (cargar-fichas-aux tablero fila columna cpu player)
@@ -30,195 +31,33 @@
     [(eq? (obtener-celda tablero fila columna) 3) (cargar-fichas-aux tablero fila (+ columna 1) cpu (append (list (list fila columna)) player))]; Esto mete las fichas de la computadora en la segunda lista de las fichas
     [else( cargar-fichas-aux tablero fila (+ columna 1) cpu player)]))
 
-(define (obtener-celda tablero fila columna)
-    (cond
-    [(or 
-        (< fila 0)
-        (< columna 0)
-        (> fila (sub1 (length tablero)))
-        (> columna (sub1 (length tablero)))) 0]
-    [else(list-ref (list-ref tablero fila) columna)]))
-
-;Funciones de movimientos
-(define (miembro? lista elemento)
-  (cond
-    [(not (eq? (member elemento lista) #f)) #t]
-    [else #f]))
-
-
-;#Funcion que devuelve los posibles movimientos de una ficha  
-(define (buscar-movimientos-vecinos mat ficha ) (remove-duplicates (buscar-movimientos-vecinos-aux  mat ficha empty empty)))
+;##########################################
+ (define (eval tablero ficha turno)
+        (define (eval_aux tablero ficha turno meta) 
+            (+ (- (first meta) (* turno (first ficha))) (- (second meta) (* turno (second ficha))))                       
+        ) 
+        ; Funcion Eval: evalua la cercania de una ficha con su meta al otro lado del tablero 
+        ; Entre menor sea su resultado , mejor
+        ; Entradas: el tablero , la ficha a evaluar y un turno (1 o -1)
+      (cond
+        [(= turno 1) (eval_aux tablero ficha turno `(8 8))] ; turno positivo , El 1 esta jugando 
+        [else ( eval_aux tablero ficha turno `(0 0))] ; turno negativo , El 3 esta jugando
+       )
+  )
 
 
+;##########################################
 
-(define (buscar-movimientos-vecinos-aux  tablero ficha anteriores movimientos);
-    (append 
-        (buscar-superior-derecho  tablero ficha anteriores 0 movimientos)
-        (buscar-superior-izquierdo  tablero ficha anteriores 0 movimientos)
-        (buscar-izquierdo tablero ficha anteriores 0 movimientos)
-        (buscar-inferior-izquierdo tablero ficha anteriores 0 movimientos)
-        (buscar-inferior-derecho  tablero ficha anteriores 0 movimientos)
-        (buscar-derecho tablero ficha anteriores 0 movimientos)
-
-        movimientos))
-
-(define (buscar-superior-derecho  tablero ficha anteriores contador movimientos); SD -1,0
-    (cond
-    [(or 
-        (> contador 1)
-        (eq? (obtener-celda tablero (sub1 (first ficha)) (second ficha)) 0)
-        (miembro? anteriores ficha))
-    movimientos]
-    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
-        (cond 
-        [(eq? (obtener-celda tablero (sub1 (first ficha)) (second ficha)) 2)
-            (buscar-superior-derecho  tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
-        [else(buscar-superior-derecho  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)])]
-    [(eq? (obtener-celda tablero (sub1 (first ficha)) (second ficha)) 2)
-        (cond 
-        [(eq? contador 0)
-            (buscar-superior-derecho  tablero ficha (cons ficha anteriores) 2 (append (list (list (sub1 (first ficha)) (second ficha))) movimientos))]
-        [else(buscar-superior-derecho  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos-aux  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
-    [else(buscar-superior-derecho  tablero (list (sub1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)]))
-
-(define (buscar-superior-izquierdo  tablero ficha anteriores contador movimientos);SI 0,-1
-    (cond
-    [(or 
-        (> contador 1)
-        (eq? (obtener-celda tablero (first ficha) (sub1 (second ficha))) 0)
-        (miembro? anteriores ficha))
-    movimientos]
-    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
-        (cond 
-        [(eq? (obtener-celda tablero (first ficha) (sub1 (second ficha))) 2)
-            (buscar-superior-izquierdo  tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
-        [else(buscar-superior-izquierdo  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
-    [(eq? (obtener-celda tablero (first ficha) (sub1 (second ficha))) 2)
-        (cond 
-        [(eq? contador 0)
-            (buscar-superior-izquierdo  tablero ficha (cons ficha anteriores) 2 (append (list (list (first ficha) (sub1 (second ficha)))) movimientos))]
-        [else(buscar-superior-izquierdo  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos-aux  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (sub1 (second ficha)))) movimientos)) movimientos))])]
-    [else(buscar-superior-izquierdo  tablero (list (first ficha) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
-
-(define (buscar-izquierdo tablero ficha anteriores contador movimientos);I +1,-1
-    (cond
-    [(or 
-        (> contador 1)
-        (eq? (obtener-celda tablero (add1 (first ficha)) (sub1 (second ficha))) 0)
-        (miembro? anteriores ficha))
-    movimientos]
-    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
-        (cond 
-        [(eq? (obtener-celda tablero (add1 (first ficha)) (sub1 (second ficha))) 2)
-            (buscar-izquierdo tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
-        [else(buscar-izquierdo tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
-    [(eq? (obtener-celda tablero (add1 (first ficha)) (sub1 (second ficha))) 2)
-        (cond 
-        [(eq? contador 0)
-            (buscar-izquierdo tablero ficha (cons ficha anteriores) 2 (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos))]
-        [else(buscar-izquierdo tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos-aux  tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (sub1 (second ficha)))) movimientos)) movimientos))])]
-    [else(buscar-izquierdo tablero (list (add1 (first ficha)) (sub1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
-
-(define (buscar-inferior-izquierdo tablero ficha anteriores contador movimientos);II +1, 0
-    (cond
-    [(or 
-        (> contador 1)
-        (eq? (obtener-celda tablero (add1 (first ficha)) (second ficha)) 0)
-        (miembro? anteriores ficha))
-    movimientos]
-    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
-        (cond 
-        [(eq? (obtener-celda tablero (add1 (first ficha)) (second ficha)) 2)
-            (buscar-inferior-izquierdo tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
-        [else(buscar-inferior-izquierdo tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)])]
-    [(eq? (obtener-celda tablero (add1 (first ficha)) (second ficha)) 2)
-        (cond 
-        [(eq? contador 0)
-            (buscar-inferior-izquierdo tablero ficha (cons ficha anteriores) 2 (append (list (list (add1 (first ficha)) (second ficha))) movimientos))]
-        [else(buscar-inferior-izquierdo tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos-aux  tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (append (list (list (add1 (first ficha)) (second ficha))) movimientos)) movimientos))])]
-    [else(buscar-inferior-izquierdo tablero (list (add1 (first ficha)) (second ficha)) (cons ficha anteriores) (add1 contador) movimientos)]))
-
-(define (buscar-inferior-derecho  tablero ficha anteriores contador movimientos);ID 0,+1
-    (cond
-    [(or 
-        (> contador 1)
-        (eq? (obtener-celda tablero (first ficha) (add1 (second ficha))) 0)
-        (miembro? anteriores ficha))
-    movimientos]
-    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
-        (cond 
-        [(eq? (obtener-celda tablero (first ficha) (add1 (second ficha))) 2)
-            (buscar-inferior-derecho  tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
-        [else(buscar-inferior-derecho  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
-    [(eq? (obtener-celda tablero (first ficha) (add1 (second ficha))) 2)
-        (cond 
-        [(eq? contador 0)
-            (buscar-inferior-derecho  tablero ficha (cons ficha anteriores) 2 (append (list (list (first ficha) (add1 (second ficha)))) movimientos))]
-        [else(buscar-inferior-derecho  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos-aux  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (first ficha) (add1 (second ficha)))) movimientos)) movimientos))])]
-    [else(buscar-inferior-derecho  tablero (list (first ficha) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
-
-(define (buscar-derecho tablero ficha anteriores contador movimientos);D -1,+1
-    (cond
-    [(or 
-        (> contador 1)
-        (eq? (obtener-celda tablero (sub1 (first ficha)) (add1 (second ficha))) 0)
-        (miembro? anteriores ficha))
-    movimientos]
-    [(eq? (obtener-celda tablero (first ficha) (second ficha)) 2)
-        (cond 
-        [(eq? (obtener-celda tablero (sub1 (first ficha)) (add1 (second ficha))) 2)
-            (buscar-derecho tablero ficha (cons ficha anteriores) (add1 contador) movimientos)]
-        [else(buscar-derecho tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)])]
-    [(eq? (obtener-celda tablero (sub1 (first ficha)) (add1 (second ficha))) 2)
-        (cond 
-        [(eq? contador 0)
-            (buscar-derecho tablero ficha (cons ficha anteriores) 2 (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos))]
-        [else(buscar-derecho tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) 0 
-            (append (buscar-movimientos-vecinos-aux  tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (append (list (list (sub1 (first ficha)) (add1 (second ficha)))) movimientos)) movimientos))])]
-    [else(buscar-derecho tablero (list (sub1 (first ficha)) (add1 (second ficha))) (cons ficha anteriores) (add1 contador) movimientos)]))
+;##########################################
 
 
-
-;Funciones de Interfaz
-(define (mostrar-tablero tablero)
-    (cond
-    [(null? tablero) "Tablero Damas chinas"]
-    [else (printf "~s\n" (first tablero)) (mostrar-tablero (rest tablero))]))
-;Servicio telefónico: Aquí se llaman las funciones para probar.
-;(mostrar-tablero (reverse (crear-tablero)))
-; (mostrar-tablero (cargar-fichas (reverse (crear-tablero))))
-
-;(obtener-celda (reverse (crear-tablero)) 7 6)
-; (obtener-celda (reverse (crear-tablero)) 6 6)
-; (obtener-celda (reverse (crear-tablero)) 7 4)
-;(remove-duplicates (buscar-movimientos-vecinos-aux (reverse (crear-tablero)) '(7 7) empty empty))
-; (remove-duplicates (buscar-movimientos-vecinos-aux '((1 1 1 1 2 2 2 2 2)
-; 					                             (1 1 1 2 2 2 2 2 2)
-; 					                             (1 2 2 2 2 2 2 2 2)
-; 					                             (1 2 2 2 2 2 1 2 2)
-; 					                             (2 2 2 2 2 2 2 3 2)
-; 					                             (2 2 2 2 2 2 2 2 2)
-; 					                             (2 2 2 2 2 2 2 3 3)
-; 					                             (2 2 2 2 2 2 3 3 3)
-; 					                             (2 2 2 2 2 3 3 3 3)) '(7 6) empty empty))
+ ;(mover (tablero-prueba) 3 '(7 6) '(7 5))
 
 
+;(tablero-prueba)
 
-
-(buscar-movimientos-vecinos  (crear-tablero) '(7 7))
-
-
-(buscar-movimientos-vecinos '((1 1 1 2 1 2 2 2 2)
-				    	  (1 1 1 2 2 3 2 2 2)
-					      (1 1 2 2 2 2 2 2 2)
-					      (1 2 2 2 2 2 2 2 2)
-					      (2 2 2 2 2 2 2 2 2)   
-					      (2 2 2 2 2 2 2 2 3)
-					      (2 2 2 2 2 2 2 3 3)
-					      (2 2 2 2 2 2 3 3 3)
-					      (2 2 2 2 2 2 3 3 3)) '(0 1) )
+;(first (cargar-fichas  (tablero-prueba))) 
+(eval (tablero-prueba) '(7 7) -1)
+(eval (tablero-prueba) '(8 6 ) -1)
+(eval (tablero-prueba) '(0 3  ) -1)
+(mostrar-tablero (tablero-prueba))
