@@ -148,9 +148,12 @@
             (marca x y 'arriba tablero)
             (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
     [(equal? tecla 'f5)
-    (define tabtemp (second (min-max tablero  dificultad 1 1)))
+        (define tabtemp (second (min-max tablero  dificultad 1 1 -999 999)))
+        (define inicio (current-inexact-milliseconds))
         (marca x y 'fcinco tabtemp)
-        (teclado x y (key-value (get-key-press ventana)) tabtemp mapa ficha tabtemp )]
+        (teclado x y (key-value (get-key-press ventana)) tabtemp mapa ficha tabtemp )
+        (define final (current-inexact-milliseconds))
+        (- final inicio)]
     [else 
             (marca x y 'arriba tablero)
             (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]

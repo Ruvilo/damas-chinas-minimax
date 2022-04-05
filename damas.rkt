@@ -323,20 +323,21 @@
     [(empty? movimientos) (cargar-movimientos-fichas-aux tablero turno (rest fichas) tableros (first fichas) (buscar-movimientos-vecinos tablero (first fichas)))]
     [else (cargar-movimientos-fichas-aux tablero turno fichas (append  tableros  (list (mover tablero turno ficha (first movimientos)))) ficha (rest movimientos))]))
 
-; Eval 
+; Funcion Eval: evalua la cercania de una ficha con su meta al otro lado del tablero 
+; Entre menor sea su resultado , mejor
+; Entradas: el tablero , la ficha a evaluar y un turno (1 o -1)
 
  (define (eval tablero ficha turno)
         (define (eval_aux tablero ficha turno meta) 
             (+ (- (first meta) (* turno (first ficha))) (- (second meta) (* turno (second ficha))))                       
         ) 
-        ; Funcion Eval: evalua la cercania de una ficha con su meta al otro lado del tablero 
-        ; Entre menor sea su resultado , mejor
-        ; Entradas: el tablero , la ficha a evaluar y un turno (1 o -1)
+        
       (cond
         [(= turno 1) (eval_aux tablero ficha turno `(8 8))] ; turno positivo , El 1 esta jugando 
         [else ( eval_aux tablero ficha turno `(0 0))] ; turno negativo , El 3 esta jugando
        )
   )
+
 
 (define (eval-tablero tablero turno) 
     (cond
@@ -350,10 +351,6 @@
 )
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
 
 (define (get-mejor-tablero puntos temp tab1 tab2 )
 
@@ -365,29 +362,28 @@
 
 
 
-(define (foreach tableros profundidad turno puntos mejor jugador); turno tiene que ir inverso 
+(define (foreach tableros profundidad turno puntos mejor jugador alpha beta); turno tiene que ir inverso 
 
  (cond
-    [(empty? tableros)( list puntos mejor) ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+    [(or
+        (empty? tableros)
+        (<= beta alpha))( list puntos mejor) ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
     [(= turno 1)
-
-    (define temp-puntos   (first (min-max (first tableros) (- profundidad 1) 3 jugador)))
-    
-    
-    (foreach (rest tableros) profundidad turno  (min temp-puntos puntos) (get-mejor-tablero temp-puntos puntos  mejor (first tableros) ) jugador) ] 
+        (define temp-puntos   (first (min-max (first tableros) (- profundidad 1) 3 jugador alpha beta)))
+        (foreach (rest tableros) profundidad turno  (min temp-puntos puntos) (get-mejor-tablero temp-puntos puntos  mejor (first tableros) ) jugador alpha (min beta temp-puntos)) ] 
 
     [else 
-    (define temp2  (max puntos (first (min-max (first tableros) (- profundidad 1) 1 jugador))))
-    (foreach (rest tableros) profundidad turno temp2 (get-mejor-tablero puntos temp2 mejor (first tableros) ) jugador )])
+    (define temp2  (max puntos (first (min-max (first tableros) (- profundidad 1) 1 jugador alpha beta))))
+    (foreach (rest tableros) profundidad turno temp2 (get-mejor-tablero puntos temp2 mejor (first tableros) ) jugador (max alpha temp2) beta)])
 )
 
 
- (define (min-max tablero profundidad turno jugador)
+ (define (min-max tablero profundidad turno jugador alpha beta)
   
  (cond
      [(= profundidad 0 )  (list (eval-tablero tablero jugador) tablero)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
-     [(= turno 1 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 999 empty jugador) ]  ;;; min
-     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 -999 empty jugador) ]) ;;; max
+     [(= turno 1 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 999 empty jugador alpha beta) ]  ;;; min
+     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 -999 empty jugador alpha beta) ]) ;;; max
 
  )
 
