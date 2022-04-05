@@ -366,7 +366,7 @@
 
 
 (define (foreach tableros profundidad turno puntos mejor ); turno tiene que ir inverso 
- (display puntos)
+ ;(display puntos)
  (cond
     [(empty? tableros)( list puntos mejor) ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
     [(= turno 3)
@@ -382,8 +382,8 @@
 
  (cond
      [(= profundidad 0 ) (list (eval-tablero tablero turno) tablero)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
-     [(= turno 3 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 0 empty) ] 
-     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 0 empty) ])
+     [(= turno 3 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 -999 empty) ] 
+     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 999 empty) ])
 
  )
 
