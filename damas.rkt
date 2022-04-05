@@ -407,9 +407,3 @@
 
 )
 
-
-( min-max (tablero-prueba)  1 1 1)
-
-( min-max (tablero-prueba)  2 1 1)
-( min-max (tablero-prueba)  3 1 1)
-( min-max (tablero-prueba)  4 1 1)

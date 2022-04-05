@@ -6,6 +6,9 @@
 (define ventana (open-viewport "Damas Chinas contra Sufeiya" 650 700))
 (define oculta (open-pixmap "Secreto" 650 700))
 
+
+(define dificultad 3) ; Entre mayor es ,  mas "dificil"
+
 ;Funcion que crea un mapa del tablero de la interfaz, para medir limites
 (define (cargar-celdas tablero)
     (cargar-celdas-aux tablero 0 0 305 50 empty empty))
@@ -145,7 +148,7 @@
             (marca x y 'arriba tablero)
             (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
     [(equal? tecla 'f5)
-    (define tabtemp (second (min-max tablero  4 1 1)))
+    (define tabtemp (second (min-max tablero  dificultad 1 1)))
         (marca x y 'fcinco tabtemp)
         (teclado x y (key-value (get-key-press ventana)) tabtemp mapa ficha tabtemp )]
     [else 
