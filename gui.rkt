@@ -145,7 +145,7 @@
             (marca x y 'arriba tablero)
             (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
     [(equal? tecla 'f5)
-    (define tabtemp (second (min-max tablero  1 1)))
+    (define tabtemp (second (min-max tablero  4 1 1)))
         (marca x y 'fcinco tabtemp)
         (teclado x y (key-value (get-key-press ventana)) tabtemp mapa ficha tabtemp )]
     [else 
