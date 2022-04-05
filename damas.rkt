@@ -366,7 +366,7 @@
 
 
 (define (foreach tableros profundidad turno puntos mejor ); turno tiene que ir inverso 
- ;(display tableros)
+ (display puntos)
  (cond
     [(empty? tableros)( list puntos mejor) ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
     [(= turno 3)
