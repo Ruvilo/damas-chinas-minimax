@@ -100,7 +100,7 @@
         ]
     [(equal? lado 'espacio)
         (mostrar-interfaz tablero)]
-    [(equal? lado 'enter)
+    [(equal? lado 'fcinco)
         (mostrar-interfaz tablero)]
     [else (void)]))
 
@@ -139,11 +139,14 @@
             (not (empty? ficha))
             (list? (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y)))))
                 (marca x y 'enter (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))
-                (teclado x y (key-value (get-key-press ventana)) 
+                (teclado x y 'f5 
                     (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))) mapa empty (mover t-original 3 ficha (buscar-indice-coordenada mapa (list x y))))]
         [else 
             (marca x y 'arriba tablero)
             (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]
+    [(equal? tecla 'f5)
+        (marca x y 'fcinco (second (min-max tablero  2 1)))
+        (teclado x y (key-value (get-key-press ventana)) (second (min-max tablero  2 1)) mapa ficha (second (min-max tablero  2 1)))]
     [else 
             (marca x y 'arriba tablero)
             (teclado x y (key-value (get-key-press ventana)) tablero mapa ficha t-original)])]

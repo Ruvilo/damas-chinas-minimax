@@ -7,6 +7,8 @@
 (provide cargar-fichas)
 (provide miembro?)
 (provide mover)
+(provide min-max)
+
 
 #|
     Proyecto 01: Minimax - Damas Chinas
@@ -367,10 +369,11 @@
  ;(display tableros)
  (cond
     [(empty? tableros)( list puntos mejor) ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
-    [(= turno 3) (define temp-puntos  (min puntos (first (min-max (first tableros) (- profundidad 1) 1) ))  )
-    (foreach (rest tableros) profundidad turno  (temp-puntos) (get-mejor-tablero temp-puntos puntos  mejor (first tableros) ) ) ] 
+    [(= turno 3)
+    (define temp-puntos  (min puntos (first (min-max (first tableros) (- profundidad 1) 1))))
+    (foreach (rest tableros) profundidad turno  temp-puntos (get-mejor-tablero temp-puntos puntos  mejor (first tableros) ) ) ] 
     [else 
-    (define temp2  (max puntos (first (min-max (first tableros) (- profundidad 1) 3)) ))
+    (define temp2  (max puntos (first (min-max (first tableros) (- profundidad 1) 3))))
     (foreach (rest tableros) profundidad turno temp2 (get-mejor-tablero puntos temp2 mejor (first tableros) ) )])
 )
 
@@ -397,4 +400,4 @@
                           (2 2 2 2 2 3 3 3 3))
 )
 
-;( min-max (tablero-prueba)  2 3)
+( min-max (tablero-prueba)  2 1)
