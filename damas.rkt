@@ -309,8 +309,11 @@
 
 
 ;Funciones minimax de Sufeiya
-(define (cargar-movimientos-fichas tablero)
-    (cargar-movimientos-fichas-aux tablero 1 (second (cargar-fichas tablero)) empty empty empty))
+(define (cargar-movimientos-fichas tablero turno)
+    (cond
+    [(eq? turno 3) (cargar-movimientos-fichas-aux tablero turno (first (cargar-fichas tablero)) empty empty empty)]
+    [else (cargar-movimientos-fichas-aux tablero turno (second (cargar-fichas tablero)) empty empty empty)])
+    )
 
 (define (cargar-movimientos-fichas-aux tablero turno fichas tableros ficha movimientos)
     (cond
@@ -341,6 +344,45 @@
 (define (eval-tablero-aux tablero turno fichas total) 
     (cond
     [(empty? fichas) (- total 20)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
-    [else (eval-tablero-aux tablero turno (rest fichas) (+ (eval tablero (first fichas) turno) total))]))
+    [else (eval-tablero-aux tablero turno (rest fichas) (+ (eval tablero (first fichas) turno) total))])
+)
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+(define (foreach tableros profundidad turno puntos); turno tiene que ir inverso 
+ ;(display tableros)
+ (cond
+    [(empty? tableros) puntos ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+    [(= turno 3) (define temp-puntos  (min puntos (min-max (first tableros) (- profundidad 1) 1) ) )
+    (foreach (rest tableros) profundidad turno  (temp-puntos)  ) ] 
+    [else (foreach (rest tableros) profundidad turno (max puntos (min-max (first tableros) (- profundidad 1) 3) ) ) ])
+)
+
+
+ (define (min-max tablero profundidad turno)
+
+ (cond
+     [(= profundidad 0 ) (eval-tablero tablero turno)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+     [(= turno 3 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 0) ] 
+     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 0 ) ])
+
+ )
+
+
+ (define (tablero-prueba) 
+                         '((1 1 1 1 2 2 2 2 2)
+                          (1 1 1 2 2 2 2 2 2)
+                          (1 2 2 2 2 2 2 2 2)
+                          (1 2 1 2 2 2 3 2 2)
+                          (2 2 3 2 2 2 2 2 2)   
+                          (2 2 2 2 2 2 3 2 2)
+                          (2 2 2 2 2 2 3 2 3)
+                          (2 2 2 2 2 2 2 2 3)
+                          (2 2 2 2 2 3 3 3 3))
+)
+
+( min-max (tablero-prueba)  2 3)
