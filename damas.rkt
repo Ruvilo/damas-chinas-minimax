@@ -353,22 +353,34 @@
 
 
 
-(define (foreach tableros profundidad turno puntos); turno tiene que ir inverso 
+(define (get-mejor-tablero puntos temp tab1 tab2 )
+
+(cond
+    [(< temp puntos) tab1 ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+    [else tab2 ])
+)
+
+
+
+
+(define (foreach tableros profundidad turno puntos mejor ); turno tiene que ir inverso 
  ;(display tableros)
  (cond
-    [(empty? tableros) puntos ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
-    [(= turno 3) (define temp-puntos  (min puntos (min-max (first tableros) (- profundidad 1) 1) ) )
-    (foreach (rest tableros) profundidad turno  (temp-puntos)  ) ] 
-    [else (foreach (rest tableros) profundidad turno (max puntos (min-max (first tableros) (- profundidad 1) 3) ) ) ])
+    [(empty? tableros)( list puntos mejor) ] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+    [(= turno 3) (define temp-puntos  (min puntos (first (min-max (first tableros) (- profundidad 1) 1) ))  )
+    (foreach (rest tableros) profundidad turno  (temp-puntos) (get-mejor-tablero temp-puntos puntos  mejor (first tableros) ) ) ] 
+    [else 
+    (define temp2  (max puntos (first (min-max (first tableros) (- profundidad 1) 3)) ))
+    (foreach (rest tableros) profundidad turno temp2 (get-mejor-tablero puntos temp2 mejor (first tableros) ) )])
 )
 
 
  (define (min-max tablero profundidad turno)
 
  (cond
-     [(= profundidad 0 ) (eval-tablero tablero turno)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
-     [(= turno 3 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 0) ] 
-     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 0 ) ])
+     [(= profundidad 0 ) (list (eval-tablero tablero turno) tablero)] ; retorna 0 cuando el jugador gana , entre mas cercano a 0 ... mejor es el tablero 
+     [(= turno 3 ) (foreach (cargar-movimientos-fichas tablero turno) profundidad 1 0 empty) ] 
+     [else  (foreach (cargar-movimientos-fichas tablero turno) profundidad 3 0 empty) ])
 
  )
 
@@ -385,4 +397,4 @@
                           (2 2 2 2 2 3 3 3 3))
 )
 
-( min-max (tablero-prueba)  2 3)
+;( min-max (tablero-prueba)  2 3)
